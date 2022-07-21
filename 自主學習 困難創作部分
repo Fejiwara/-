@@ -1,0 +1,53 @@
+#敵機
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)  
+        self.image = pygame.transform.scale(enemy_img, (50, 38))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.radius = 20  
+        
+        self.rect.x = random.randrange(0, WIDTH)
+        self.rect.y = random.randrange(-100, -40)
+        self.speedy2 = random.randrange(2, 8)
+        self.speedx2 = random.randrange(-5, 5)
+
+    def update(self):
+        self.rect.y += self.speedy2
+       # self.rect.x += self.speedx2
+        if self.rect.top > HEIGHT:
+            self.rect.bottom = 0
+        if self.rect.bottom < 0:
+            self.rect.top = 0
+        if self.rect.bottom > 200:
+            self.rect.bottom = 200
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+#敵機
+        enemy = Enemy()
+        enemys = pygame.sprite.Group()
+        enemys.add(enemy)
+        all_sprites.add(enemys)
+        pekoshot = pygame.USEREVENT
+        pygame.time.set_timer(pekoshot, 500)
+#子彈、敵機碰撞
+    hits = pygame.sprite.groupcollide(enemys, bullets, 1, 1) 
+    for i in hits:
+       score += 500
+       enemy = Enemy()
+       all_sprites.add(enemy)
+       enemys.add(enemy)
+    hits = pygame.sprite.spritecollide(player, ebullets, 1, pygame.sprite.collide_circle)
+    if hits:
+        player.health -= 20
+        random.choice(expl_sounds).play()
+    if player.health <= 0:
+            death_expl = Explosion(player.rect.center, 'player')
+            all_sprites.add(death_expl)
+            die_sound.play()
+            player.lives -= 1
+            player.health = 100
+            player.hide()
+        
