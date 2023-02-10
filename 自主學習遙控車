@@ -1,0 +1,106 @@
+#include <SoftwareSerial.h>
+char cmd;
+const byte LEFT1 = 8;  //IN1
+const byte LEFT2 = 9;  //IN2
+const byte LEFT_PWM = 10;
+
+// 右馬達控制設定
+const byte RIGHT1 = 7;  //IN3
+const byte RIGHT2 = 6;  //IN4
+const byte RIGHT_PWM = 5;
+
+
+byte motorSpeed = 130;
+
+
+SoftwareSerial BT(2, 3); 
+
+void forward() {  // 前進
+  //左輪
+  digitalWrite(LEFT1, HIGH);
+  digitalWrite(LEFT2, LOW);
+  analogWrite(LEFT_PWM, motorSpeed);
+  
+  
+  digitalWrite(RIGHT1, LOW);
+  digitalWrite(RIGHT2, HIGH);
+
+  analogWrite(RIGHT_PWM, motorSpeed);
+}
+
+void backward() { // 後退
+  digitalWrite(LEFT1, LOW);
+  digitalWrite(LEFT2, HIGH);
+  analogWrite(LEFT_PWM, motorSpeed);
+
+  digitalWrite(RIGHT1, HIGH);
+  digitalWrite(RIGHT2, LOW);
+  analogWrite(RIGHT_PWM, motorSpeed);
+}
+
+void turnLeft() { // 左轉
+
+  
+  analogWrite(LEFT_PWM, 0);
+
+  digitalWrite(RIGHT1, LOW);
+  digitalWrite(RIGHT2, HIGH);
+  analogWrite(RIGHT_PWM, motorSpeed);
+}
+
+void turnRight() {  // 右轉
+  
+  
+  digitalWrite(LEFT1, HIGH);
+  digitalWrite(LEFT2, LOW);
+  analogWrite(LEFT_PWM, motorSpeed);
+  
+  analogWrite(RIGHT_PWM, 0);
+}
+
+void stopMotor() {  //停止，兩輪速度為0
+  
+  analogWrite(LEFT_PWM, 0);
+
+  analogWrite(RIGHT_PWM, 0);
+}
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);   
+  
+  
+
+  pinMode(LEFT1, OUTPUT);
+  pinMode(LEFT2, OUTPUT);
+  pinMode(LEFT_PWM, OUTPUT);
+  pinMode(RIGHT1, OUTPUT);
+  pinMode(RIGHT2, OUTPUT);
+  pinMode(RIGHT_PWM, OUTPUT);
+  
+}
+
+void loop() {
+  if (BT.available()) {
+   
+    cmd = BT.read();
+    
+    switch (cmd) {
+      case 'w':   // 接收到'w'，前進。
+        forward();
+        break;
+      case 'x':   // 接收到'x'，後退。
+        backward();
+        break;
+      case 'a':   // 接收到'a'，左轉。
+        turnLeft();
+        break;
+      case 'd':   // 接收到'd'，右轉。
+        turnRight();
+        break;
+      case 's':   // 接收到's'，停止。
+        stopMotor();
+        break;
+    }
+  }
+}
